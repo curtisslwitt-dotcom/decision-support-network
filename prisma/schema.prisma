@@ -1,0 +1,109 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/cca_decision_support_network/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model DSA {
+  id                    String    @id @default(cuid())
+  slug                  String    @unique
+  name                  String
+  organization          String?
+  expert                String?
+  description           String
+  longDescription       String?
+  category              String
+  categorySlug          String
+  decisionSupported     String
+  intendedAudience      String?
+  geography             String?
+  humanUrl              String
+  decisionToolsUrl      String?
+  capabilityManifestUrl String
+  webMcpAvailable       Boolean   @default(false)
+  webMcpToolName        String?
+  webMcpDescription     String?
+  restApiAvailable      Boolean   @default(false)
+  restApiUrl            String?
+  openApiUrl            String?
+  remoteMcpAvailable    Boolean   @default(false)
+  remoteMcpUrl          String?
+  primaryMcpTool        String?
+  safetyLimitations     String?
+  version               String?
+  sourceLastUpdated     DateTime?
+  ccaLastVerified       DateTime?
+  verificationLevel     String    @default("CCA Verified")
+  listingStatus         String    @default("active")
+  featured              Boolean   @default(false)
+  featuredOrder         Int?
+  manifestRawData       Json?
+  manifestFetchedAt     DateTime?
+  manifestSourceVersion String?
+  manifestValidStatus   String?
+  manifestErrors        String?
+  primaryCta            String?
+  whoIsItFor            String?
+  whatInfoUsed          String?
+  whatItReturns         String?
+  whatItDoes            String?
+  whatItDoesNot         String?
+  aboutOrg              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([categorySlug])
+  @@index([listingStatus])
+  @@index([geography])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  icon        String?
+  order       Int?
+  createdAt   DateTime @default(now())
+}
+
+model ManifestFetchLog {
+  id         String   @id @default(cuid())
+  dsaId      String
+  fetchedAt  DateTime @default(now())
+  success    Boolean
+  statusCode Int?
+  errors     String?
+  diff       Json?
+
+  @@index([dsaId])
+}
+
+model AnalyticsEvent {
+  id          String   @id @default(cuid())
+  eventType   String
+  interface   String
+  query       String?
+  category    String?
+  geography   String?
+  topResult   String?
+  selectedDsa String?
+  resultCount Int?
+  noMatch     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
